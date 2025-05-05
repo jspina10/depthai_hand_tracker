@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
+import argparse
 
 from HandTrackerRenderer import HandTrackerRenderer
-import argparse
+from HandDataStorage import HandDataStorage
+# from data_transfer._zmq.zmq_publisher import ZMQPublisher
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-e', '--edge', action="store_true",
@@ -53,7 +55,8 @@ if args.edge:
     from HandTrackerEdge import HandTracker
     tracker_args['use_same_image'] = not args.dont_force_same_image
 else:
-    from HandTracker import HandTracker
+    # from HandTracker import HandTracker
+    from HandTracker2 import HandTracker
 
 
 tracker = HandTracker(
@@ -77,6 +80,14 @@ renderer = HandTrackerRenderer(
         tracker=tracker,
         output=args.output)
 
+saver = HandDataStorage()
+
+# publisher = ZMQPublisher(port=5556)
+# topic = "positions"
+# publisher.send_message(topic, message)
+# publisher.close()
+
+
 while True:
     # Run hand tracker on next frame
     # 'bag' contains some information related to the frame 
@@ -87,7 +98,10 @@ while True:
     # Draw hands
     frame = renderer.draw(frame, hands, bag)
     key = renderer.waitKey(delay=1)
+    # Save hands
+    saver.save(frame, hands, bag)
     if key == 27 or key == ord('q'):
         break
 renderer.exit()
 tracker.exit()
+saver.end()
