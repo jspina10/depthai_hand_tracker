@@ -43,7 +43,8 @@ class HandTrackerRenderer:
         if output is None:
             self.output = None
         else:
-            fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+            # fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+            fourcc = cv2.VideoWriter_fourcc(*"XVID")
             self.output = cv2.VideoWriter(output,fourcc,self.tracker.video_fps,(self.tracker.img_w, self.tracker.img_h)) 
 
     def norm2abs(self, x_y):
